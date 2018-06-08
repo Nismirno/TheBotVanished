@@ -37,7 +37,48 @@ bot = commands.Bot(command_prefix='-', description=description)
 twitter = TwitterHandle()
 userIDs = {"tsv": "984234517308243968",
            "tucker": "994077432897523713"}
-importantTweets = {}
+importantTweets = {"first encounter": ["991537892974628864",
+                                       "991537892974628864"],
+                   "stars": ["991540490712514560"],
+                   "heat": ["991704363080015872",
+                            "992095357617127424",
+                            "992097650043334656",
+                            "993219119800573952"],
+                   "danyon intro": ["992186003824762880",
+                                    "992186272788738048",
+                                    "992187930398613505"],
+                   "tranced person": ["992192628287516672",
+                                      "992193987921567744",
+                                      "992194748483063808",
+                                      "992220920096976896",
+                                      "992230769174118406",
+                                      "992244435026169856"],
+                   "bc": ["992619707432828928",
+                          "995860972458962944"],
+                   "screaming": ["992989445182935041"],
+                   "red light": ["993709748267683840",
+                                 "993714245484318725"],
+                   "tucker intro": ["994091501985632258"],
+                   "intrusion": ["994424394754732033",
+                                 "994434436547665921"],
+                   "headlights info": ["994729995716177920"],
+                   "neighbor house": ["997322492929769473"],
+                   "water": ["999734193801265152"],
+                   "note": ["1000486534146154498"],
+                   "spaceship": ["1001284425001431044"],
+                   "blue light": ["998672244854480896",
+                                  "1001579421109800960"],
+                   "journal": ["1002762807035736065",
+                               "1002763771012698112",
+                               "1002765355180285952",
+                               "1002771616907087872"],
+                   "body": ["1002289486544490499",
+                            "1002293338140274688",
+                            "1004241447351177216"],
+                   "virginia": ["994441330100260864"],
+                   "global": ["994651789210390528"],
+                   "west coast": ["996429172405829632"]
+                   }
 
 
 def makeEmbedTweet(data):
@@ -64,23 +105,26 @@ def makeEmbedTweet(data):
     ts = datetime.strptime(data["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
     footerText = "Tweet created on"
     footerIcon = "https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697029-twitter-512.png"
-    imageURL = ""
     hasVideo = False
-    if ("entities" in data and "media" in data["entities"]):
-        media = data["entities"]["media"]
-        if (len(media) == 1):
-            if media[0]["type"] != "video":
-                imageURL = media[0]["media_url_https"]
+    images = []
+    extendedTweet = False
+    if ("extended_entities" in data and "media" in data["extended_entities"]):
+        extendedTweet = True
+        for media in data["extended_entities"]["media"]:
+            if media["type"] != "video":
+                mediaFile = media["media_url_https"]
+                images.append(mediaFile)
             else:
                 hasVideo = True
 
-    if ("extended_entities" in data and "media" in data["extended_entities"]):
-        media = data["extended_entities"]["media"]
-        if (len(media) == 1):
-            if media[0]["type"] != "video":
-                imageURL = media[0]["media_url_https"]
-            else:
-                hasVideo = True
+    if not extendedTweet:
+        if ("entities" in data and "media" in data["entities"]):
+            for media in data["entities"]["media"]:
+                if media["type"] != "video":
+                    mediaFile = media["media_url_https"]
+                    images.append(mediaFile)
+                else:
+                    hasVideo = True
 
     if hasVideo:
         text += " _tweet has a video_"
@@ -93,15 +137,28 @@ def makeEmbedTweet(data):
                  "type": "rich",
                  "description": text,
                  "url": url,
-                 "colour": color,
+                 "color": color,
                  "author": author}
 
-    newEmbed = Embed.from_data(embedData)
-    newEmbed.set_footer(text=footerText, icon_url=footerIcon)
-    newEmbed.timestamp = ts
-    if imageURL and not hasVideo:
-        newEmbed.set_image(url=imageURL)
-    return newEmbed
+    embeds = [Embed.from_data(embedData)]
+    embeds[0].set_footer(text=footerText, icon_url=footerIcon)
+    embeds[0].timestamp = ts
+    embeds[0].timestamp = ts
+    if len(images) and not hasVideo:
+        embeds[0].set_image(url=images[0])
+    if len(images) < 2:
+        return embeds
+    for i in range(1, len(images)):
+        embedData = {"title": title,
+                     "author": author,
+                     "url": url,
+                     "color": color,
+                     "type": "rich"}
+        embeds.append(Embed.from_data(embedData))
+        embeds[-1].set_image(url=images[i])
+        embeds[-1].set_footer(text=footerText, icon_url=footerIcon)
+        embeds[-1].timestamp = ts
+        return embeds
 
 
 @bot.event
@@ -109,8 +166,6 @@ async def on_ready():
     print("Logged in as")
     print(bot.user.name)
     print(bot.user.id)
-    for server in bot.servers:
-        print(dir(server))
     print("------")
 
 
@@ -119,42 +174,60 @@ async def tweet(*args):
     """
     Command to post one of the tweets from TSV or Tucker
 
-    Parameters
-    ----------
-    i : Optional[int]
-        Picks a i-th tweet from the last N tweets from chosen account
-    name : Optional[str]
-        Choses between TSV or Tucker accounts (default: TSV)
+    Usage:
+    -tweet username: posts last tweet from chosen account
+    Example -tweet tucker
+
+    -tweet username n: posts nth tweet out of last 20
+    Example -tweet tsv 15
+
+    -tweet "keyword": posts tweets which correspond to a chosen keyword
+    Example -tweet "first encounter"
     """
     if not args:
-        tweet = twitter.getTweet(userID=userIDs["tsv"],
-                                 iTweet=0)
-        if tweet:
-            embed = makeEmbedTweet(tweet)
-            await bot.say(embed=embed)
+        text = "Specify username. Available usernames: \n"
+        for key in userIDs:
+            text += f"`{key}`\n"
+        await bot.say(text)
+        return
+    if (args[0] in userIDs):
+        if len(args) == 2:
+            if int(args[1]) > MAXTWEETS:
+                await bot.say(f"Number should be between 1 and {MAXTWEETS}")
+                return
+            tweet = twitter.getTweet(userID=userIDs[args[0]],
+                                     iTweet=int(args[1])-1)
+            embeds = makeEmbedTweet(tweet)
+            for embed in embeds:
+                await bot.say(embed=embed)
             return
         else:
-            await bot.say("<@177856625485414400> Something went wrong")
-    if (args[0] in userIDs) and (args[1].isdigit()):
-        if int(args[1]) > MAXTWEETS:
-            await bot.say(f"Number should be between 1 and {MAXTWEETS}")
+            tweet = twitter.getTweet(userID=userIDs[args[0]],
+                                     iTweet=0)
+            embeds = makeEmbedTweet(tweet)
+            for embed in embeds:
+                await bot.say(embed=embed)
             return
-        tweet = twitter.getTweet(userID=userIDs[args[0]],
-                                 iTweet=int(args[1])-1)
-        embed = makeEmbedTweet(tweet)
-        await bot.say(embed=embed)
-        return
-    if args[0].isdigit():
-        tweet = twitter.getTweet(userID=userIDs["tsv"],
-                                 iTweet=int(args[0])-1)
-        embed = makeEmbedTweet(tweet)
-        await bot.say(embed=embed)
-        return
     if args[0] in importantTweets:
-        statusID = importantTweets[args[0]]
-        tweet = twitter.getTweet(statusID=statusID)
-        embed = makeEmbedTweet(tweet)
-        await bot.say(embed=embed)
+        statusIDs = importantTweets[args[0]]
+        for status in statusIDs:
+            tweet = twitter.getTweet(statusID=status)
+            embeds = makeEmbedTweet(tweet)
+            for embed in embeds:
+                await bot.say(embed=embed)
         return
+
+
+@bot.command()
+async def list():
+    """
+    Posts a list of keyword which can be used with -tweet command
+    """
+    text = "```\n"
+    for key in importantTweets:
+        text += key + "\n"
+    text += "```"
+    await bot.say(text)
+
 
 bot.run(TOKEN)
