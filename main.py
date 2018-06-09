@@ -161,6 +161,10 @@ def makeEmbedTweet(data):
         return embeds
 
 
+def notWelcomeChannel(ctx):
+    return ctx.message.channel.id != '446432988104884224'
+
+
 @bot.event
 async def on_ready():
     print("Logged in as")
@@ -172,6 +176,7 @@ async def on_ready():
 
 
 @bot.command()
+@commands.check(notWelcomeChannel)
 @commands.cooldown(1, 60, commands.BucketType.channel)
 async def tweet(*args):
     """
@@ -234,6 +239,7 @@ async def tweet(*args):
 
 
 @bot.command()
+@commands.check(notWelcomeChannel)
 async def list():
     """
     Posts a list of keyword which can be used with -tweet command
@@ -247,6 +253,7 @@ async def list():
 
 
 @bot.command()
+@commands.check(notWelcomeChannel)
 async def accounts():
     """
     Posts a list of accounts which can be used with -tweet command
