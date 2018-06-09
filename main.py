@@ -166,10 +166,13 @@ async def on_ready():
     print("Logged in as")
     print(bot.user.name)
     print(bot.user.id)
+    for server in bot.servers:
+        print(server.name, server.id)
     print("------")
 
 
 @bot.command()
+@commands.cooldown(1, 60, commands.BucketType.channel)
 async def tweet(*args):
     """
     Command to post one of the tweets from TSV or Tucker
@@ -216,6 +219,15 @@ async def tweet(*args):
             for embed in embeds:
                 await bot.say(embed=embed)
         return
+    else:
+        text = "Unknown keyword or account name\n"
+        text += "Please use `-list` command for a keyword list or `-accounts` for a list of available account names"
+        await bot.say(text)
+        return
+    text = "Unknown format\n"
+    text += "Please consult with `-help tweet` to see examples of command format"
+    await bot.say(text)
+    return
 
 
 @bot.command()
@@ -223,8 +235,22 @@ async def list():
     """
     Posts a list of keyword which can be used with -tweet command
     """
-    text = "```\n"
+    text = "Here is a list of available keywords\n"
+    text += "```\n"
     for key in importantTweets:
+        text += key + "\n"
+    text += "```"
+    await bot.say(text)
+
+
+@bot.command()
+async def accounts():
+    """
+    Posts a list of accounts which can be used with -tweet command
+    """
+    text = "Here is a list of available account names\n"
+    text += "```\n"
+    for key in userIDs:
         text += key + "\n"
     text += "```"
     await bot.say(text)
