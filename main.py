@@ -187,47 +187,50 @@ async def tweet(*args):
     -tweet "keyword": posts tweets which correspond to a chosen keyword
     Example -tweet "first encounter"
     """
-    if not args:
-        text = "Specify username. Available usernames: \n"
-        for key in userIDs:
-            text += f"`{key}`\n"
-        await bot.say(text)
-        return
-    if (args[0] in userIDs):
-        if len(args) == 2:
-            if int(args[1]) > MAXTWEETS:
-                await bot.say(f"Number should be between 1 and {MAXTWEETS}")
+    try:
+        if not args:
+            text = "Specify username. Available usernames: \n"
+            for key in userIDs:
+                text += f"`{key}`\n"
+            await bot.say(text)
+            return
+        if (args[0] in userIDs):
+            if len(args) == 2:
+                if int(args[1]) > MAXTWEETS:
+                    await bot.say(f"Number should be between 1 and {MAXTWEETS}")
+                    return
+                tweet = twitter.getTweet(userID=userIDs[args[0]],
+                                         iTweet=int(args[1])-1)
+                embeds = makeEmbedTweet(tweet)
+                for embed in embeds:
+                    await bot.say(embed=embed)
                 return
-            tweet = twitter.getTweet(userID=userIDs[args[0]],
-                                     iTweet=int(args[1])-1)
-            embeds = makeEmbedTweet(tweet)
-            for embed in embeds:
-                await bot.say(embed=embed)
+            else:
+                tweet = twitter.getTweet(userID=userIDs[args[0]],
+                                         iTweet=0)
+                embeds = makeEmbedTweet(tweet)
+                for embed in embeds:
+                    await bot.say(embed=embed)
+                return
+        if args[0] in importantTweets:
+            statusIDs = importantTweets[args[0]]
+            for status in statusIDs:
+                tweet = twitter.getTweet(statusID=status)
+                embeds = makeEmbedTweet(tweet)
+                for embed in embeds:
+                    await bot.say(embed=embed)
             return
         else:
-            tweet = twitter.getTweet(userID=userIDs[args[0]],
-                                     iTweet=0)
-            embeds = makeEmbedTweet(tweet)
-            for embed in embeds:
-                await bot.say(embed=embed)
+            text = "Unknown keyword or account name\n"
+            text += "Please use `-list` command for a keyword list or `-accounts` for a list of available account names"
+            await bot.say(text)
             return
-    if args[0] in importantTweets:
-        statusIDs = importantTweets[args[0]]
-        for status in statusIDs:
-            tweet = twitter.getTweet(statusID=status)
-            embeds = makeEmbedTweet(tweet)
-            for embed in embeds:
-                await bot.say(embed=embed)
-        return
-    else:
-        text = "Unknown keyword or account name\n"
-        text += "Please use `-list` command for a keyword list or `-accounts` for a list of available account names"
+        text = "Unknown format\n"
+        text += "Please consult with `-help tweet` to see examples of command format"
         await bot.say(text)
         return
-    text = "Unknown format\n"
-    text += "Please consult with `-help tweet` to see examples of command format"
-    await bot.say(text)
-    return
+    except commands.errors.CommandOnCooldown as e:
+        await bot.say(e)
 
 
 @bot.command()
