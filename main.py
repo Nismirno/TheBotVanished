@@ -268,7 +268,7 @@ async def accounts():
 
 
 @bot.command(pass_context=True)
-@commands.has_any_role(["Staff", "Suns", "co-owners"])
+@commands.has_any_role("Staff", "Suns", "co-owners")
 #@commands.guild_only()
 async def kickrole(ctx, roleName: str):
     """
