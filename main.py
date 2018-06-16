@@ -267,9 +267,9 @@ async def accounts():
     await bot.say(text)
 
 
-@bot.command()
+@bot.command(pass_context=True)
 @commands.has_any_role(["Staff", "Suns", "co-owners"])
-@commands.guild_only()
+#@commands.guild_only()
 async def kickrole(ctx, roleName: str):
     """
     Allows for moderator to kick users which have a specific role
