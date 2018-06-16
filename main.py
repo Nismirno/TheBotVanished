@@ -3,6 +3,7 @@ from discord.ext import commands
 from twitterHandle import TwitterHandle
 from discord.embeds import Embed
 from datetime import datetime
+from datetime import timedelta
 from pprint import pprint
 import json
 import random
@@ -264,6 +265,36 @@ async def accounts():
         text += key + "\n"
     text += "```"
     await bot.say(text)
+
+
+@bot.command()
+@commands.has_any_role(["Staff", "Suns", "co-owners"])
+@commands.guild_only()
+async def kickrole(ctx, roleName: str):
+    """
+    Allows for moderator to kick users which have a specific role
+    """
+    requiredDelta = timedelta(days=1)
+    currentTime = datetime.utcnow()
+    server = ctx.guild
+    roleNames = [role.name.lower() for role in server.roles]
+    if roleName.lower() not in roleNames:
+        text = f"Could not find {roleName} on the server"
+        await bot.say(text)
+        return
+    users = server.members
+    selectedUsers = []
+    for user in users:
+        userRoleNames = [role.name.lower() for role in user.roles]
+        if roleName.lower() not in userRoleNames:
+            continue
+        userTime = currentTime - user.joined_at
+        if userTime > requiredDelta:
+            selectedUsers.append(user)
+    reason = "Daily cleaning of welcome channel"
+    for user in selectedUsers:
+        user.kick(reason)
+    return
 
 
 bot.run(TOKEN)
