@@ -5,6 +5,7 @@ from discord.embeds import Embed
 from datetime import datetime
 from datetime import timedelta
 from pprint import pprint
+from typing import Union, Optional
 import json
 import random
 import html
@@ -171,15 +172,15 @@ async def on_ready():
     print("Logged in as")
     print(bot.user.name)
     print(bot.user.id)
-    for server in bot.servers:
-        print(server.name, server.id)
+    for guild in bot.guilds:
+        print(guild.name, guild.id)
     print("------")
 
 
 @bot.command()
 @commands.check(notWelcomeChannel)
 @commands.cooldown(1, 60, commands.BucketType.channel)
-async def tweet(*args):
+async def tweet(ctx, *args):
     """
     Command to post one of the tweets from TSV or Tucker
 
@@ -198,25 +199,25 @@ async def tweet(*args):
             text = "Specify username. Available usernames: \n"
             for key in userIDs:
                 text += f"`{key}`\n"
-            await bot.say(text)
+            await ctx.send(text)
             return
         if (args[0] in userIDs):
             if len(args) == 2:
                 if int(args[1]) > MAXTWEETS:
-                    await bot.say(f"Number should be between 1 and {MAXTWEETS}")
+                    await ctx.send(f"Number should be between 1 and {MAXTWEETS}")
                     return
                 tweet = twitter.getTweet(userID=userIDs[args[0]],
                                          iTweet=int(args[1])-1)
                 embeds = makeEmbedTweet(tweet)
                 for embed in embeds:
-                    await bot.say(embed=embed)
+                    await ctx.send(embed=embed)
                 return
             else:
                 tweet = twitter.getTweet(userID=userIDs[args[0]],
                                          iTweet=0)
                 embeds = makeEmbedTweet(tweet)
                 for embed in embeds:
-                    await bot.say(embed=embed)
+                    await ctx.send(embed=embed)
                 return
         if args[0] in importantTweets:
             statusIDs = importantTweets[args[0]]
@@ -224,24 +225,24 @@ async def tweet(*args):
                 tweet = twitter.getTweet(statusID=status)
                 embeds = makeEmbedTweet(tweet)
                 for embed in embeds:
-                    await bot.say(embed=embed)
+                    await ctx.send(embed=embed)
             return
         else:
             text = "Unknown keyword or account name\n"
             text += "Please use `-list` command for a keyword list or `-accounts` for a list of available account names"
-            await bot.say(text)
+            await ctx.send(text)
             return
         text = "Unknown format\n"
         text += "Please consult with `-help tweet` to see examples of command format"
-        await bot.say(text)
+        await ctx.send(text)
         return
     except commands.errors.CommandOnCooldown as e:
-        await bot.say(e)
+        await ctx.send(e)
 
 
 @bot.command()
 @commands.check(notWelcomeChannel)
-async def list():
+async def list(ctx):
     """
     Posts a list of keyword which can be used with -tweet command
     """
@@ -250,12 +251,12 @@ async def list():
     for key in importantTweets:
         text += key + "\n"
     text += "```"
-    await bot.say(text)
+    await ctx.send(text)
 
 
 @bot.command()
 @commands.check(notWelcomeChannel)
-async def accounts():
+async def accounts(ctx):
     """
     Posts a list of accounts which can be used with -tweet command
     """
@@ -264,25 +265,52 @@ async def accounts():
     for key in userIDs:
         text += key + "\n"
     text += "```"
-    await bot.say(text)
+    await ctx.send(text)
 
 
-@bot.command(pass_context=True)
+@bot.command()
 @commands.has_any_role("Staff", "Suns", "co-owners")
 #@commands.guild_only()
-async def kickrole(ctx, roleName: str):
+async def kickrole(ctx, roleName: str = None,
+                   delta: str = None):
     """
     Allows for moderator to kick users which have a specific role
     """
-    requiredDelta = timedelta(days=1)
-    currentTime = datetime.utcnow()
-    server = ctx.guild
-    roleNames = [role.name.lower() for role in server.roles]
-    if roleName.lower() not in roleNames:
-        text = f"Could not find {roleName} on the server"
-        await bot.say(text)
+    await ctx.message.delete()
+    timeUnits = {'w': 7,
+                 'd': 1,
+                 'h': None}
+    if (not roleName):
+        await ctx.send("Please specify role")
         return
-    users = server.members
+    if delta:
+        if delta.isalpha():
+            await ctx.send("Missing number of weeks/days/hours")
+            return
+        elif delta.isdigit():
+            time = int(delta)
+            requiredDelta = timedelta(days=time)
+        elif (delta[:-1].isdigit() and delta[-1].isalpha()):
+            unit = delta[-1]
+            if (unit not in timeUnits):
+                await ctx.send("Unspecified time unit. Please use w, d or h")
+                return
+            elif unit == 'h':
+                time = int(delta[:-1])
+                requiredDelta = timedelta(hours=time)                
+            else:
+                time = int(delta[:-1]) * timeUnits[unit]
+                requiredDelta = timedelta(days=time)
+    else:
+        requiredDelta = timedelta(days=1)
+    currentTime = datetime.utcnow()
+    guild = ctx.guild
+    roleNames = [role.name.lower() for role in guild.roles]
+    if roleName.lower() not in roleNames:
+        text = f"Could not find {roleName} role on the server"
+        await ctx.send(text)
+        return
+    users = guild.members
     selectedUsers = []
     for user in users:
         userRoleNames = [role.name.lower() for role in user.roles]
@@ -292,8 +320,24 @@ async def kickrole(ctx, roleName: str):
         if userTime > requiredDelta:
             selectedUsers.append(user)
     reason = "Daily cleaning of welcome channel"
-    for user in selectedUsers:
-        user.kick(reason)
+    if requiredDelta.days > 1:
+        mTime = f"{str(requiredDelta.days)} days" 
+    elif requiredDelta.days == 1:
+        mTime = f"{str(requiredDelta.days)} day"
+    elif requiredDelta.seconds > 3600:
+        mTime = f"{str(requiredDelta.seconds // 3600)} hours"
+    else:
+        mTime = f"{str(requiredDelta.seconds // 3600)} hour"
+    userMessage = f"You were kicked from {guild.name} server as you was not "
+    userMessage += f"able to get access in {mTime} time.\n"
+    userMessage += "You can return to the server at any time to try again."
+    for user in selectedUsers:  
+        await user.kick(reason=reason)
+        dmChannel = await user.create_dm()
+        try:
+            await dmChannel.send(userMessage)
+        except discord.errors.Forbidden:
+            pass
     return
 
 
