@@ -163,8 +163,29 @@ def makeEmbedTweet(data):
         return embeds
 
 
-def notWelcomeChannel(ctx):
+def not_welcome_channel(ctx):
     return ctx.message.channel.id != '446432988104884224'
+
+
+def is_owner(ctx):
+    author = ctx.message.author
+    owner = ctx.guild.owner
+    return (owner is not None and author.id == owner.id)
+
+
+def has_permissions(**perms):
+    def predicate(ctx):
+        if is_owner(ctx):
+            return True
+        if not perms:
+            return False
+
+        ch = ctx.message.channel
+        author = ctx.message.author
+        resolved = ch.permissions_for(author)
+        return all(getattr(resolved, name, None) == value
+                   for name, value in perms.items())
+    return commands.check(predicate)
 
 
 @bot.event
@@ -178,8 +199,8 @@ async def on_ready():
 
 
 @bot.command()
-@commands.check(notWelcomeChannel)
-@commands.cooldown(1, 60, commands.BucketType.channel)
+@commands.check(not_welcome_channel)
+@commands.cooldown(1, 30, commands.BucketType.user)
 async def tweet(ctx, *args):
     """
     Command to post one of the tweets from TSV or Tucker
@@ -241,7 +262,7 @@ async def tweet(ctx, *args):
 
 
 @bot.command()
-@commands.check(notWelcomeChannel)
+@commands.check(not_welcome_channel)
 async def list(ctx):
     """
     Posts a list of keyword which can be used with -tweet command
@@ -255,7 +276,7 @@ async def list(ctx):
 
 
 @bot.command()
-@commands.check(notWelcomeChannel)
+@commands.check(not_welcome_channel)
 async def accounts(ctx):
     """
     Posts a list of accounts which can be used with -tweet command
@@ -269,8 +290,7 @@ async def accounts(ctx):
 
 
 @bot.command()
-@commands.has_any_role("Staff", "Suns", "co-owners")
-#@commands.guild_only()
+@has_permissions(kick_members=True)
 async def kickrole(ctx, roleName: str = None,
                    delta: str = None):
     """
@@ -321,7 +341,7 @@ async def kickrole(ctx, roleName: str = None,
             selectedUsers.append(user)
     reason = "Daily cleaning of welcome channel"
     if requiredDelta.days > 1:
-        mTime = f"{str(requiredDelta.days)} days" 
+        mTime = f"{str(requiredDelta.days)} days"
     elif requiredDelta.days == 1:
         mTime = f"{str(requiredDelta.days)} day"
     elif requiredDelta.seconds > 3600:
@@ -331,7 +351,7 @@ async def kickrole(ctx, roleName: str = None,
     userMessage = f"You were kicked from {guild.name} server as you was not "
     userMessage += f"able to get access in {mTime} time.\n"
     userMessage += "You can return to the server at any time to try again."
-    for user in selectedUsers:  
+    for user in selectedUsers:
         await user.kick(reason=reason)
         dmChannel = await user.create_dm()
         try:
