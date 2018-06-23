@@ -200,7 +200,7 @@ async def on_ready():
 
 @bot.command()
 @commands.check(not_welcome_channel)
-@commands.cooldown(1, 30, commands.BucketType.user)
+@commands.cooldown(1, 10, commands.BucketType.user)
 async def tweet(ctx, *args):
     """
     Command to post one of the tweets from TSV or Tucker
