@@ -352,12 +352,12 @@ async def kickrole(ctx, roleName: str = None,
     userMessage += f"able to get access in {mTime} time.\n"
     userMessage += "You can return to the server at any time to try again."
     for user in selectedUsers:
-        await user.kick(reason=reason)
         dmChannel = await user.create_dm()
         try:
             await dmChannel.send(userMessage)
         except discord.errors.Forbidden:
             pass
+        await user.kick(reason=reason)
     return
 
 
