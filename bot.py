@@ -208,7 +208,7 @@ async def on_message(message: discord.Message):
     is_mod = 446430809000247297 in author_roles_id
     is_admin = author.guild_permissions.administrator
     is_owner = (author.guild.owner == author)
-    is_welcome = type == MessageType.new_member
+    is_welcome = type_ == MessageType.new_member
     if not (is_bot or is_mod or is_admin or is_owner or is_welcome):
         if message.channel.id == 446432988104884224:
             await message.delete()
