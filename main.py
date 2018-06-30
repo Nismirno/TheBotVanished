@@ -1,10 +1,10 @@
 import discord
+from discord.permissions import Permissions
 from discord.ext import commands
 from twitterHandle import TwitterHandle
 from discord.embeds import Embed
 from datetime import datetime
 from datetime import timedelta
-from pprint import pprint
 from typing import Union, Optional
 import json
 import random
@@ -39,8 +39,7 @@ bot = commands.Bot(command_prefix='-', description=description)
 twitter = TwitterHandle()
 userIDs = {"tsv": "984234517308243968",
            "tucker": "994077432897523713"}
-importantTweets = {"first encounter": ["991537892974628864",
-                                       "991537892974628864"],
+importantTweets = {"first encounter": ["991537892974628864"],
                    "stars": ["991540490712514560"],
                    "heat": ["991704363080015872",
                             "992095357617127424",
@@ -163,8 +162,10 @@ def makeEmbedTweet(data):
         return embeds
 
 
-def not_welcome_channel(ctx):
-    return ctx.message.channel.id != '446432988104884224'
+def not_welcome_channel():
+    def predicate(ctx):
+        return ctx.message.channel.id != 446432988104884224
+    return commands.check(predicate)
 
 
 def is_owner(ctx):
@@ -198,10 +199,24 @@ async def on_ready():
     print("------")
 
 
+@bot.event
+async def on_message(message: discord.Message):
+    author = message.author
+    is_bot = author.bot
+    author_roles_id = [role.id for role in author.roles]
+    is_mod = 446430809000247297 in author_roles_id
+    is_admin = author.guild_permissions.administrator
+    is_owner = (author.guild.owner == author)
+    if not (is_bot or is_mod or is_admin or is_owner):
+        if message.channel.id == 446432988104884224:
+            await message.delete()
+    await bot.process_commands(message)
+
+
 @bot.command()
-@commands.check(not_welcome_channel)
+@not_welcome_channel()
 @commands.cooldown(1, 10, commands.BucketType.user)
-async def tweet(ctx, *args):
+async def tweet(ctx: commands.Context, *args):
     """
     Command to post one of the tweets from TSV or Tucker
 
@@ -262,7 +277,7 @@ async def tweet(ctx, *args):
 
 
 @bot.command()
-@commands.check(not_welcome_channel)
+@not_welcome_channel()
 async def list(ctx):
     """
     Posts a list of keyword which can be used with -tweet command
@@ -276,7 +291,7 @@ async def list(ctx):
 
 
 @bot.command()
-@commands.check(not_welcome_channel)
+@not_welcome_channel()
 async def accounts(ctx):
     """
     Posts a list of accounts which can be used with -tweet command
