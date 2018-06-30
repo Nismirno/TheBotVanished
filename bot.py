@@ -1,5 +1,5 @@
 import discord
-from discord.permissions import Permissions
+from discord.message import MessageType
 from discord.ext import commands
 from twitterHandle import TwitterHandle
 from discord.embeds import Embed
@@ -202,12 +202,14 @@ async def on_ready():
 @bot.event
 async def on_message(message: discord.Message):
     author = message.author
+    type_ = message.type
     is_bot = author.bot
     author_roles_id = [role.id for role in author.roles]
     is_mod = 446430809000247297 in author_roles_id
     is_admin = author.guild_permissions.administrator
     is_owner = (author.guild.owner == author)
-    if not (is_bot or is_mod or is_admin or is_owner):
+    is_welcome = type == MessageType.new_member
+    if not (is_bot or is_mod or is_admin or is_owner or is_welcome):
         if message.channel.id == 446432988104884224:
             await message.delete()
     await bot.process_commands(message)
