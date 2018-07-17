@@ -75,8 +75,8 @@ class Mod:
         """
         pass
 
-    @saferole.command(name="set")
-    async def _set(self, ctx, role_):
+    @saferole.command(name="add")
+    async def _add(self, ctx, role_):
         """
         Add new role to the safe roles list.
 
@@ -181,7 +181,7 @@ class Mod:
                 continue
             if role not in member.roles:
                 continue
-            time_since_joined = currentTime - user.joined_at
+            time_since_joined = current_time - user.joined_at
             if time_since_joined > time_delta:
                 members_to_kick.append(member)
         reason = "Daily cleaning of welcome channel"
