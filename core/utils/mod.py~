@@ -1,8 +1,0 @@
-import asyncio
-from datetime import timedelta
-from typing import List, Iterable, Union
-
-import discord
-
-from core import Config
-from core.bot import Red
