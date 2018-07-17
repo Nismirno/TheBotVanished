@@ -181,7 +181,7 @@ class Mod:
                 continue
             if role not in member.roles:
                 continue
-            time_since_joined = current_time - user.joined_at
+            time_since_joined = current_time - member.joined_at
             if time_since_joined > time_delta:
                 members_to_kick.append(member)
         reason = "Daily cleaning of welcome channel"
