@@ -23,6 +23,3 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-
-# Our configuration files
-config.py

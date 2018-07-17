@@ -238,6 +238,8 @@ class Streaming:
                     continue
                 if 'retweeted_status' in tweet:
                     continue
+                if tweet["user"]["id_str"] not in twitter_ids:
+                    continue
                 embeds = prepare_embed(tweet)
                 await self._send_webhooks(
                     tweet, embeds, webhooks, guilds_data
@@ -262,6 +264,8 @@ class Streaming:
         icon_url = data["user"]["profile_image_url"]
         for webhook in webhooks:
             async with aiohttp.ClientSession() as session:
+                if data["user"]["id_str"] not in webhook["ids"]:
+                    continue
                 wh = Webhook.from_url(
                     webhook["url"],
                     adapter=AsyncWebhookAdapter(session)
