@@ -62,7 +62,7 @@ class Mod:
         Example:  
         `[p]lock #channel`
         """
-        await self.conf.channel(channel).locked(True)
+        await self.conf.channel(channel).locked.set(True)
 
     @commands.group()
     @commands.guild_only()
