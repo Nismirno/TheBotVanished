@@ -191,12 +191,12 @@ class Mod:
         dm_message += f"able to get access in 1 day time.\n"
         dm_message += "You can return to the server at any time to try again."
         for member in members_to_kick:
-            dm_channel = await user.create_dm()
+            dm_channel = await member.create_dm()
             try:
                 await dm_channel.send(dm_message)
             except discord.errors.Forbidden:
                 pass
-            await user.kick(reason=reason)
+            await member.kick(reason=reason)
 
     async def _resolve_name(
             self, ctx, name: str
