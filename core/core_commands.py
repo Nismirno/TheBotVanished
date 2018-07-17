@@ -2,6 +2,8 @@ from discord.ext import commands
 from core import checks
 import datetime
 import discord
+from .utils.chat_formatting import pagify, box, inline
+
 
 class Core:
     """Core function commands."""
