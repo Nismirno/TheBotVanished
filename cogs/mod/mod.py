@@ -76,7 +76,7 @@ class Mod:
         pass
 
     @saferole.command(name="set")
-    async def _set(self, ctx, role_: Union[discord.Role, str]):
+    async def _set(self, ctx, role_):
         """
         Add new role to the safe roles list.
 
@@ -96,7 +96,7 @@ class Mod:
         await self.conf.guild(ctx.guild).safe_roles.set(safe_roles)
 
     @saferole.command(name="remove")
-    async def _remove(self, ctx, role_: Union[discord.Role, str]):
+    async def _remove(self, ctx, role_):
         """
         Remove role from safe roles list
 
@@ -131,7 +131,7 @@ class Mod:
     async def kick(
             self,
             ctx,
-            target: Union[discord.Role, discord.Member, str],
+            target,
             *,
             reason: str = ""
     ):
