@@ -1,4 +1,5 @@
 from discord.ext import commands
+from core import checks
 import datetime
 
 
@@ -34,7 +35,7 @@ class Core:
 
         return fmt.format(d=days, h=hours, m=minutes, s=seconds)
 
-    @commands.command(name="set", autohelp=True)
+    @commands.group(name="set", autohelp=True)
     @checks.mod_or_permissions()
     async def _set(self, ctx):
         """Changes bot's settings"""
@@ -63,7 +64,7 @@ class Core:
     @_set.command()
     @checks.guildowner()
     @commands.guild_only()
-    async def adminrole(self, ctx, *, role_: Union[discord.Role, str]):
+    async def adminrole(self, ctx, *, role_):
         """Sets the admin role for this server"""
         role = role_
         if isinstance(role, str):
@@ -76,7 +77,7 @@ class Core:
     @_set.command()
     @checks.admin_or_permissions()
     @commands.guild_only()
-    async def modrole(self, ctx, *, role_: Union[discord.Role, str]):
+    async def modrole(self, ctx, *, role_):
         """Sets the mod role for this server"""
         role = role_
         if isinstance(role, str):
@@ -86,7 +87,7 @@ class Core:
         await ctx.bot.config.guild(ctx.guild).mod_role.set(role.id)
         await ctx.send(_("The mod role for this guild has been set."))
 
-    await def _resolve_role_name(self, ctx, name: str):
+    async def _resolve_role_name(self, ctx, name: str):
         guild = ctx.guild
         roles = guild.roles
         for role in roles:
@@ -94,4 +95,3 @@ class Core:
                 return role
         await ctx.send(f"Could not find role {name}")
         return None
-

@@ -1,6 +1,7 @@
 from core.data_manager import core_data_path, load_basic_configuration
 from core.bot import TheBotVanished
 from core.events import init_events
+from core.core_commands import Core
 import os
 import sys
 import asyncio
@@ -81,6 +82,7 @@ def main():
     log = init_logging()
     tbv = TheBotVanished(description=description)
     init_events(tbv)
+    tbv.add_cog(Core(tbv))
     loop = asyncio.get_event_loop()
     tmp_data = {}
     loop.run_until_complete(get_token_and_prefix(tbv, tmp_data))
