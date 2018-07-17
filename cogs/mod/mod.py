@@ -164,7 +164,7 @@ class Mod:
         await ctx.message.delete()
         guild = ctx.guild
         roles = guild.roles
-        safe_roles = await self.conf.guild(guild).safe_roles
+        safe_roles = await self.conf.guild(guild).safe_roles()
         if role not in roles:
             await ctx.send(f"Could not find role {str(role)}")
             return
