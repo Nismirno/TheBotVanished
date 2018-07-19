@@ -93,14 +93,14 @@ class Core:
     @checks.bot_in_a_guild()
     @checks.is_owner()
     async def _game(self, ctx, *, game: str = None):
-        """Sets Red's playing status"""
+        """Sets bot's playing status"""
 
         if game:
             game = discord.Game(name=game)
         else:
             game = None
         status = ctx.bot.guilds[0].me.status if len(ctx.bot.guilds) > 0 else discord.Status.online
-        await ctx.bot.change_presence(status=status, activity=game)
+        await ctx.bot.change_presence(status=status, game=game)
         await ctx.send("Game set.")
 
 

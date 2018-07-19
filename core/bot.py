@@ -18,7 +18,7 @@ from .help_formatter import Help, help as help_
 log = logging.getLogger("tbv")
 
 initial_extensions = (
-    "cogs.mod"
+    "cogs.mod",
 )
 
 
