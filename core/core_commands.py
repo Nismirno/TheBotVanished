@@ -74,7 +74,7 @@ class Core:
         if not role:
             return
         await ctx.bot.config.guild(ctx.guild).admin_role.set(role.id)
-        await ctx.send(_("The admin role for this guild has been set."))
+        await ctx.send("The admin role for this guild has been set.")
 
     @_set.command()
     @checks.admin_or_permissions()
@@ -87,7 +87,22 @@ class Core:
         if not role:
             return
         await ctx.bot.config.guild(ctx.guild).mod_role.set(role.id)
-        await ctx.send(_("The mod role for this guild has been set."))
+        await ctx.send("The mod role for this guild has been set.")
+
+    @_set.command(name="game")
+    @checks.bot_in_a_guild()
+    @checks.is_owner()
+    async def _game(self, ctx, *, game: str = None):
+        """Sets Red's playing status"""
+
+        if game:
+            game = discord.Game(name=game)
+        else:
+            game = None
+        status = ctx.bot.guilds[0].me.status if len(ctx.bot.guilds) > 0 else discord.Status.online
+        await ctx.bot.change_presence(status=status, activity=game)
+        await ctx.send("Game set.")
+
 
     async def _resolve_role_name(self, ctx, name: str):
         guild = ctx.guild

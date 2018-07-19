@@ -73,13 +73,12 @@ class TheBotVanished(Bot):
         self.remove_command("help")
         self.add_command(help_)
 
-        self.load_extension("cogs.mod")
-        # for ext in initial_extensions:
-        #     try:
-        #         self.load_extension(ext)
-        #     except Exception as e:
-        #         print(f"Failed to load extension {ext}", file=sys.stderr)
-        #         log.exception(f"Failed to load extension {ext}")
+        for ext in initial_extensions:
+            try:
+                self.load_extension(ext)
+            except Exception as e:
+                print(f"Failed to load extension {ext}", file=sys.stderr)
+                log.exception(f"Failed to load extension {ext}")
 
     async def _get_owner(self, indict):
         indict["owner_id"] = await self.config.owner()

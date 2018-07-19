@@ -260,7 +260,7 @@ class Streaming:
             webhooks,
             guilds
     ):
-        username = data["user"]["screen_name"]
+        username = data["user"]["name"]
         icon_url = data["user"]["profile_image_url"]
         for webhook in webhooks:
             async with aiohttp.ClientSession() as session:
