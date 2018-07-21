@@ -90,9 +90,9 @@ def init_events(bot):
     @bot.event
     async def on_command_error(ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send_help()
+            await send_help(ctx)
         elif isinstance(error, commands.BadArgument):
-            await ctx.send_help()
+            await send_help(ctx)
         elif isinstance(error, commands.DisabledCommand):
             await ctx.send("That command is disabled.")
         elif isinstance(error, commands.CommandInvokeError):
@@ -185,3 +185,16 @@ def _get_startup_screen_specs():
         ascii_border = False
 
     return on_symbol, off_symbol, ascii_border
+
+async def send_help(ctx):
+    """Send the command help message."""
+    command = ctx.invoked_subcommand or ctx.command
+    destination = ctx
+    embeds = await ctx.bot.formatter.format_help_for(ctx, command)
+    for embed in embeds:
+        try:
+            m = await destination.send(embed=embed)
+        except discord.HTTPException:
+            destination = ctx.author
+            m = await destination.send(embed=embed)
+            ret.append(m)

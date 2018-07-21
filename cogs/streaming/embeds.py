@@ -22,6 +22,9 @@ def prepare_embed(data):
     if "extended_tweet" in data:
         text = data["extended_tweet"]["full_text"]
         entities = data["extended_tweet"]["entities"]
+    elif "full_text" in data:
+        text = data["full_text"]
+        entities = data["entities"]
     else:
         text = data["text"]
         entities = data["entities"]

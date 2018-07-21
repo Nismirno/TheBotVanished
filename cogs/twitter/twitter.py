@@ -284,7 +284,7 @@ class Twitter:
         id_ = accounts[name]
         try:
             statuses = await self.client.api.statuses.user_timeline.get(
-                user_id=id_
+                user_id=id_, tweet_mode="extended"
             )
         except Exception as e:
             await ctx.send(f"Unexcepted error {e}")
