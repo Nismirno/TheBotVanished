@@ -57,7 +57,7 @@ class Mod:
     @checks.mod_or_permissions()
     async def lock_channel(self, ctx, channel: discord.TextChannel):
         """
-        Auto deletes messages in channel
+        Auto deletes messages in channel.
 
         Example:  
         `[p]lock #channel`
@@ -118,7 +118,7 @@ class Mod:
     @saferole.command(name="removeall")
     async def _removeall(self, ctx):
         """
-        Remove all roles from safe roles list
+        Remove all roles from safe roles list.
 
         Example:
         `[p]saferole removeall`
@@ -140,7 +140,7 @@ class Mod:
         Do a server wide announce for a set role.
 
         Example:
-        `[p]announce Listeners #announcments Tucker is alive!
+        `[p]announce Listeners #announcments Tucker is alive!`
         """
         guild = ctx.guild
         roles = guild.roles
@@ -155,10 +155,14 @@ class Mod:
                 break
         if not isinstance(channel, discord.TextChannel):
             channel = self._resolve_name(ctx, channel)
+        disable = True
+        if role.mentionable:
+            disable = False
         await role.edit(mentionable=True)
         message = ' '.join([role.mention, message])
         await channel.send(content=message)
-        await role.edit(mentionable=False)
+        if disable:
+            await role.edit(mentionable=False)
 
     @commands.command()
     @commands.guild_only()
@@ -171,7 +175,7 @@ class Mod:
             reason: str = ""
     ):
         """
-        Kicks user or all users with a selected role
+        Kicks user or all users with a selected role.
 
         Examples: 
         `[p]kick @Username`

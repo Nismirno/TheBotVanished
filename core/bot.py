@@ -27,6 +27,7 @@ class TheBotVanished(Bot):
             packages=[],
             owner=None,
             embeds=True,
+            activity=None,
             color=15158332,
             help__page_char_limit=1000,
             help__max_pages_in_guild=2,
@@ -34,6 +35,7 @@ class TheBotVanished(Bot):
         )
         self.conf.register_guild(
             prefix=[],
+            disabled_channels=[],
             admin_role=None,
             mod_role=None,
             embeds=None,
@@ -76,12 +78,12 @@ class TheBotVanished(Bot):
 
     async def is_admin(self, member: discord.Member):
         admin_role = await self.conf.guild(member.guild).admin_role()
-        return any(role.id == admin_role for role in memeber.roles)
+        return any(role.id == admin_role for role in member.roles)
 
     async def is_mod(self, member: discord.Member):
         mod_role = await self.conf.guild(member.guild).mod_role()
         admin_role = await self.conf.guild(member.guild).admin_role()
-        return any(role.id in (admin_role, mod_role) for role in memeber.roles)
+        return any(role.id in (admin_role, mod_role) for role in member.roles)
 
     async def embed_requested(self, channel, user, command=None) -> bool:
         """

@@ -51,21 +51,21 @@ class Streaming:
             channels = {}
         )
 
-        loop = asyncio.get_event_loop()
-        loop.create_task(self._init_client())
-        loop.create_task(self._start_stream())
+        # loop = asyncio.get_event_loop()
+        # loop.create_task(self._init_client())
+        # loop.create_task(self._start_stream())
 
     @commands.group()
     @checks.mod_or_permissions()
     @commands.guild_only()
     async def stream(self, ctx):
-        """Allows to control twitter streaming manually"""
+        """Allows to control twitter streaming manually."""
         pass
 
     @stream.command(name="start")
     @checks.is_owner()
     async def start(self, ctx, wh_name: str = "Name"):
-        """Start streaming to the current channel"""
+        """Start streaming to the current channel."""
         await self._stop_stream()
         await self._init_client()
 
@@ -86,7 +86,7 @@ class Streaming:
     @checks.mod_or_permissions()
     async def mention(self, ctx, role_name: str):
         """
-        Adds role to mention when new tweet comes
+        Adds role to mention when new tweet comes.
 
         Example:
         `[p]stream mention Listeners`
@@ -121,7 +121,7 @@ class Streaming:
     @checks.mod_or_permissions()
     async def follow(self, ctx, id_):
         """
-        Adds new account to the stream
+        Adds new account to the stream.
 
         Example:
         `[p]stream follow 123456`
@@ -150,7 +150,7 @@ class Streaming:
     @checks.mod_or_permissions()
     async def unfollow(self, ctx, id_):
         """ 
-        Removes an account from the stream
+        Removes an account from the stream.
 
         Examples:
         `[p]stream unfollow 123456`
@@ -177,7 +177,7 @@ class Streaming:
     @stream.command(name="stop")
     @checks.is_owner()
     async def stop(self, ctx):
-        """ Stops the stream """
+        """Stops the stream."""
         await self._stop_stream()
 
     @commands.command(name="auth")
@@ -190,7 +190,7 @@ class Streaming:
             token: str,
             token_secret: str
     ):
-        """ Adds twitter authetication keys to the bot """
+        """Adds twitter authetication keys to the bot."""
         await self.conf.auth.consumer_key.set(key)
         await self.conf.auth.consumer_secret.set(secret)
         await self.conf.auth.access_token.set(token)

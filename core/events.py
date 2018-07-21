@@ -28,6 +28,11 @@ def init_events(bot):
 
         bot.uptime = datetime.datetime.utcnow()
         packages = await bot.conf.packages()
+        activity_message = await bot.conf.activity()
+        if activity_message:
+            game = discord.Game(name=activity_message)
+            status = discord.Status.online
+            await bot.change_presence(status=status, game=game)
 
         if packages:
             to_remove = []
@@ -134,6 +139,18 @@ def init_events(bot):
             )
         else:
             logger.exception(type(error).__name__, exc_info=error)
+
+    @bot.event
+    async def on_message(message):
+        guild = message.guild
+        channel = message.channel
+        author = message.author
+        is_mod = await bot.is_mod(author)
+        is_owner = await bot.is_owner(author)
+        disabled_channels = await bot.conf.guild(guild).disabled_channels()
+        if channel.id in disabled_channels and not (is_mod or is_owner):
+            return
+        await bot.process_commands(message)
 
 
 def _get_startup_screen_specs():

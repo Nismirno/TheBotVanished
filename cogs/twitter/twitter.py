@@ -35,8 +35,18 @@ class Twitter:
     @commands.guild_only()
     async def tweet(self, ctx):
         """
-        Commands to post or update key tweets/followed accounts
+        Commands to post or update key tweets/followed accounts.
         """
+        if ctx.invoked_subcommand is None:
+            command = ctx.command
+            destination = ctx
+            embeds = await self.bot.formatter.format_help_for(ctx, command)
+            for embed in embeds:
+                try:
+                    await destination.send(embed=embed)
+                except discord.HTTPException:
+                    destination = ctx.author
+                    await destination.send(embed=embed)
         pass
 
     @tweet.command(name="post")
@@ -44,7 +54,7 @@ class Twitter:
     @commands.cooldown(1, 15, BucketType.user)
     async def post_tweet(self, ctx, *, content):
         """
-        Post one of key tweets or one of the last tweets from followed accounts
+        Post one of key tweets or one of the last tweets from followed accounts.
 
         Example:
         `[p]tweet post spaceship`
@@ -142,6 +152,7 @@ class Twitter:
     @commands.guild_only()
     @commands.cooldown(1, 30, BucketType.user)
     async def list_tweets(self, ctx):
+        """Lists keyword with short descriptions."""
         descriptions = await self.conf.guild(ctx.guild).descriptions()
         key_str = "Keyword"
         desc_str = "Description"
@@ -155,6 +166,7 @@ class Twitter:
     @commands.guild_only()
     @commands.cooldown(1, 30, BucketType.user)
     async def list_accounts(self, ctx):
+        """Lists followed accounts."""
         accounts = await self.conf.guild(ctx.guild).accounts()
         lang = f"Following accounts:"
         message = ""
@@ -175,7 +187,7 @@ class Twitter:
         """
         Adds new account to follow list.
 
-        serverMod permission required
+        serverMod permission required.
 
         Example:
         `[p]tweet adduser tsv 984234517308243968`
@@ -219,7 +231,7 @@ class Twitter:
         """
         Remove account from follow list.
 
-        serverMod permission required
+        serverMod permission required.
 
         Example:
         `[p]tweet removeuser nat`
