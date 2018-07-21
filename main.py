@@ -1,15 +1,17 @@
-from core.data_manager import core_data_path, load_basic_configuration
-from core.bot import TheBotVanished
-from core.events import init_events
-from core.core_commands import Core
 import os
 import sys
 import asyncio
 import logging
-import discord
 import logging.handlers
 import inspect
 from pathlib import Path
+
+import discord
+
+from core.data_manager import core_data_path, load_basic_configuration
+from core.bot import TheBotVanished
+from core.events import init_events
+from core.core_commands import Core
 
 
 def init_logging():
@@ -18,7 +20,7 @@ def init_logging():
     dpy_logger.setLevel(logging.INFO)
 
     tbv_logger = logging.getLogger("tbv")
-    tbv_logger.setLevel(logging.WARNING)
+    tbv_logger.setLevel(logging.INFO)
 
     log_format = logging.Formatter(
         "%(asctime)s %(levelname)s %(module)s %(funcName)s %(lineno)d: %(message)s",
@@ -47,8 +49,8 @@ def init_logging():
 
 
 async def get_token_and_prefix(bot, temp: dict):
-    temp["token"] = await bot.config.token()
-    temp["prefix"] = await bot.config.prefix()
+    temp["token"] = await bot.conf.token()
+    temp["prefix"] = await bot.conf.prefix()
 
 
 def setup_token_and_prefix(bot, token_set: bool, prefix_set: bool):

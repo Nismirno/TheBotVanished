@@ -147,8 +147,8 @@ async def is_mod_or_superior(
         raise TypeError("Only messages, members or roles may be passed")
 
     server = obj.guild
-    admin_role_id = await bot.config.guild(server).admin_role()
-    mod_role_id = await bot.config.guild(server).mod_role()
+    admin_role_id = await bot.conf.guild(server).admin_role()
+    mod_role_id = await bot.conf.guild(server).mod_role()
 
     if isinstance(obj, discord.Role):
         return obj.id in [admin_role_id, mod_role_id]
@@ -205,7 +205,7 @@ async def is_admin_or_superior(
         raise TypeError("Only messages, members or roles may be passed")
 
     server = obj.guild
-    admin_role_id = await bot.config.guild(server).admin_role()
+    admin_role_id = await bot.conf.guild(server).admin_role()
 
     if isinstance(obj, discord.Role):
         return obj.id == admin_role_id

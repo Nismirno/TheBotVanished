@@ -54,7 +54,7 @@ class Help(formatter.HelpFormatter):
         if self.pm_check(self.context):
             return self.context.bot.color
         else:
-            if await self.context.bot.config.guild(self.context.guild).use_bot_color():
+            if await self.context.bot.conf.guild(self.context.guild).use_bot_color():
                 return self.context.bot.color
             else:
                 return self.me.color
@@ -122,7 +122,7 @@ class Help(formatter.HelpFormatter):
             # <description> portion
             emb["embed"]["description"] = description[:2046]
 
-        tagline = await self.context.bot.config.help.tagline()
+        tagline = await self.context.bot.conf.help.tagline()
         if tagline:
             footer = tagline
         else:
@@ -229,7 +229,7 @@ class Help(formatter.HelpFormatter):
 
         ret = []
 
-        page_char_limit = await ctx.bot.config.help.page_char_limit()
+        page_char_limit = await ctx.bot.conf.help.page_char_limit()
         field_groups = self.group_fields(emb["fields"], page_char_limit)
 
         for i, group in enumerate(field_groups, 1):
@@ -337,7 +337,7 @@ async def help(ctx, *cmds: str):
         else:
             embeds = await f.format_help_for(ctx, command)
 
-    max_pages_in_guild = await ctx.bot.config.help.max_pages_in_guild()
+    max_pages_in_guild = await ctx.bot.conf.help.max_pages_in_guild()
     if len(embeds) > max_pages_in_guild:
         destination = ctx.author
 
