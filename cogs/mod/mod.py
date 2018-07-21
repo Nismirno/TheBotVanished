@@ -127,6 +127,41 @@ class Mod:
 
     @commands.command()
     @commands.guild_only()
+    @checks.mod_or_permissions(manage_roles=True)
+    async def announce(
+            self,
+            ctx,
+            mention: str,
+            channel: discord.TextChannel,
+            *,
+            message: str
+    ):
+        """
+        Do a server wide announce for a set role.
+
+        Example:
+        `[p]announce Listeners #announcments Tucker is alive!
+        """
+        guild = ctx.guild
+        roles = guild.roles
+        role_names = [role.name for role in roles]
+        if mention not in role_names:
+            await ctx.send(f"Could not find role {mention}")
+            return
+        role = None
+        for r in roles:
+            if mention==r.name:
+                role = r
+                break
+        if not isinstance(channel, discord.TextChannel):
+            channel = self._resolve_name(ctx, channel)
+        await role.edit(mentionable=True)
+        message = ' '.join([role.mention, message])
+        await channel.send(content=message)
+        await role.edit(mentionable=False)
+
+    @commands.command()
+    @commands.guild_only()
     @checks.mod_or_permissions(kick_members=True)
     async def kick(
             self,
@@ -200,9 +235,10 @@ class Mod:
 
     async def _resolve_name(
             self, ctx, name: str
-    ) -> Union[discord.Member, discord.Role]:
+    ) -> Union[discord.Member, discord.Role, discord.TextChannel]:
         guild = ctx.guild
         roles = guild.roles
+        channels = guild.channels
         for role in roles:
             if role.name == name:
                 return role
@@ -213,4 +249,7 @@ class Mod:
                 selected_members.append(member)
         if len(selected_members) == 1:
             return selected_members[0]
+        for channel in channels:
+            if channel.name == name:
+                return channel
         return None
