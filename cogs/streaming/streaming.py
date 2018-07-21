@@ -51,9 +51,9 @@ class Streaming:
             channels = {}
         )
 
-        # loop = asyncio.get_event_loop()
-        # loop.create_task(self._init_client())
-        # loop.create_task(self._start_stream())
+        loop = asyncio.get_event_loop()
+        loop.create_task(self._init_client())
+        loop.create_task(self._start_stream())
 
     @commands.group()
     @checks.mod_or_permissions()
