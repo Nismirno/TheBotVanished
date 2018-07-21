@@ -136,7 +136,7 @@ class Core:
     @checks.is_owner()
     async def _game(self, ctx, *, game: str = None):
         """Sets bot's playing status."""
-        activity_message = name
+        activity_message = game
         if game:
             game = discord.Game(name=game)
         else:
