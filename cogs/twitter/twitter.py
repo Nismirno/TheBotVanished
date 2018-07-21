@@ -194,7 +194,7 @@ class Twitter:
                     user_id=user
                 )
             except peony.exceptions.NotFound as e:
-                await ctx.send(e["errors"][0]["message"])
+                await ctx.send(e)
                 return
             accounts[name] = account["id_str"]
         else:
@@ -203,7 +203,7 @@ class Twitter:
                     screen_name=user
                 )
             except peony.exceptions.NotFound as e:
-                await ctx.send(e["errors"][0]["message"])
+                await ctx.send(e)
                 return
             accounts[name] = account["id_str"]
         await self.conf.guild(ctx.guild).accounts.set(accounts)
