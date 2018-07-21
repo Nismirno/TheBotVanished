@@ -27,9 +27,9 @@ class Twitter:
             accounts = {}
         )
 
-        # loop = asyncio.get_event_loop()
-        # loop.create_task(self._init_client())
-        # loop.create_task(self._load_tweets())
+        loop = asyncio.get_event_loop()
+        loop.create_task(self._init_client())
+        loop.create_task(self._load_tweets())
 
     @commands.group()
     @commands.guild_only()
