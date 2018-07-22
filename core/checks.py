@@ -40,7 +40,7 @@ async def is_mod_or_superior(ctx):
         return await ctx.bot.is_owner(ctx.author)
     else:
         author = ctx.author
-        settings = ctx.bot.db.guild(ctx.guild)
+        settings = ctx.bot.conf.guild(ctx.guild)
         mod_role_id = await settings.mod_role()
         admin_role_id = await settings.admin_role()
 
@@ -60,7 +60,7 @@ async def is_admin_or_superior(ctx):
         return await ctx.bot.is_owner(ctx.author)
     else:
         author = ctx.author
-        settings = ctx.bot.db.guild(ctx.guild)
+        settings = ctx.bot.conf.guild(ctx.guild)
         admin_role_id = await settings.admin_role()
         admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
 
