@@ -57,12 +57,29 @@ class Mod:
     @checks.mod_or_permissions()
     async def lock_channel(self, ctx, channel: discord.TextChannel):
         """
-        Auto deletes messages in channel.
+        Locks channel for everyone except mods and bots.
 
-        Example:  
+        Locking means auto-deletion of messages.
+
+        Example:
         `[p]lock #channel`
         """
+        if isinstance(channel, str):
+            channel = self._resolve_name(channel)
         await self.conf.channel(channel).locked.set(True)
+
+    @commands.command(name="unlock")
+    @checks.mod_or_permissions()
+    async def unlock_channel(self, ctx, channel: discord.TextChannel):
+        """
+        Unlocks channel for users.
+
+        Example:  
+        `[p]unlock #channel`
+        """
+        if isinstance(channel, str):
+            channel = self._resolve_name(channel)
+        await self.conf.channel(channel).locked.set(False)
 
     @commands.group()
     @commands.guild_only()
