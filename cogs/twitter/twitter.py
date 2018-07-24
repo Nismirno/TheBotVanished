@@ -259,10 +259,7 @@ class Twitter:
                         )
                     except peony.exceptions.NotFound as e:
                         continue
-                if self.tweets[str(status)]:
-                    self.tweets[str(status)].append(tweet)
-                else:
-                    self.tweets[str(status)] = [tweet]
+                    self.tweets[str(status)] = tweet
 
     async def _update_tweets(
             self,
