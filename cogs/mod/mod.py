@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
+import logging
+from typing import Union
+from datetime import datetime
+from datetime import timedelta
 
 from discord.ext import commands
 from discord.channel import TextChannel
 from discord.message import MessageType
 import discord
 
-from typing import Union
-from datetime import datetime
-from datetime import timedelta
-
 from core.utils.mod import is_mod_or_superior
 from core.config import Config
 from core import checks
+
+logger = logging.getLogger("tbv.mod")
+
 
 class Mod:
     """Moderator tools."""
@@ -245,13 +248,16 @@ class Mod:
             reason = reason_
         dm_message = f"You were kicked from {guild.name} server as you was not "
         dm_message += f"able to get access in 1 day time.\n"
-        dm_message += "You can return to the server at any time to try again."
+        dm_message += "You can return to the server at any time to try again.\n"
+        invites = [i for i in await guild.invites() if i.max_age == 0]
+        invite = max(invites, key=lambda x: x.uses)
+        dm_message += f"{invite.url}"
         for member in members_to_kick:
             dm_channel = await member.create_dm()
             try:
                 await dm_channel.send(dm_message)
             except discord.errors.Forbidden:
-                pass
+                log.info(f"Could not send a DM to {member.name}")
             await member.kick(reason=reason)
 
     async def _resolve_name(
