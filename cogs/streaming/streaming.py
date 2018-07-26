@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import discord
 from discord.ext import commands
 from discord.webhook import Webhook, AsyncWebhookAdapter
 from discord.channel import TextChannel
@@ -9,10 +7,8 @@ import asyncio
 import aiohttp
 import peony
 
-import sys
 import logging
 import random
-from typing import Tuple
 import requests.packages.urllib3 as urllib3
 
 from core.config import Config
@@ -28,6 +24,7 @@ default_webhook = {
     "mention_role": ""
 }
 
+
 class Streaming:
     """The description for Twitter goes here."""
 
@@ -40,15 +37,15 @@ class Streaming:
         self._guilds = self.bot.guilds
 
         self.conf.register_global(
-            auth__consumer_key = None,
-            auth__consumer_secret = None,
-            auth__access_token = None,
-            auth__access_token_secret = None
+            auth__consumer_key=None,
+            auth__consumer_secret=None,
+            auth__access_token=None,
+            auth__access_token_secret=None
         )
 
         self.conf.register_guild(
-            phrases = [],
-            channels = {}
+            phrases=[],
+            channels={}
         )
 
         loop = asyncio.get_event_loop()
@@ -149,7 +146,7 @@ class Streaming:
     @stream.command(name="unfollow")
     @checks.mod_or_permissions()
     async def unfollow(self, ctx, id_):
-        """ 
+        """
         Removes an account from the stream.
 
         Examples:

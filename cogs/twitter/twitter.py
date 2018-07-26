@@ -1,6 +1,7 @@
 import asyncio
 
 import peony
+import discord
 from discord.ext import commands
 from discord.ext.commands import BucketType
 
@@ -9,6 +10,7 @@ from core import checks
 from cogs.streaming.embeds import prepare_embed
 from core.utils.chat_formatting import box
 
+
 class Twitter:
     def __init__(self, bot, config=Config):
         self.client = None
@@ -16,15 +18,15 @@ class Twitter:
         self.conf = config.get_cog_conf(self, force_registration=True)
         self.tweets = {}
         self.conf.register_global(
-            auth__consumer_key = None,
-            auth__consumer_secret = None,
-            auth__access_token = None,
-            auth__access_token_secret = None
+            auth__consumer_key=None,
+            auth__consumer_secret=None,
+            auth__access_token=None,
+            auth__access_token_secret=None
         )
         self.conf.register_guild(
-            tweets = {},
-            descriptions = {},
-            accounts = {}
+            tweets={},
+            descriptions={},
+            accounts={}
         )
 
         loop = asyncio.get_event_loop()
@@ -119,7 +121,7 @@ class Twitter:
     ):
         """
         Remove key tweet or tweet from the list.
-        
+
         serverMod permission required.
 
         Example:
@@ -173,7 +175,6 @@ class Twitter:
         for acc in accounts:
             message += f"{acc}\n"
         await ctx.send(box(message, lang=lang))
-
 
     @tweet.command(name="adduser")
     @commands.guild_only()
