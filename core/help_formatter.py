@@ -132,7 +132,10 @@ class Help(formatter.HelpFormatter):
         if isinstance(self.command, discord.ext.commands.core.Command):
             # <signature portion>
             emb["embed"]["title"] = emb["embed"]["description"]
-            emb["embed"]["description"] = "`Syntax: {0}`".format(self.get_command_signature())
+            syntax = f"`Syntax: {self.get_command_signature()}`"
+            if self.has_subcommands():
+                syntax += " <subcommand>"
+            emb["embed"]["description"] = syntax
 
             # <long doc> section
             if self.command.help:
@@ -293,7 +296,7 @@ async def help(ctx, *cmds: str):
     )
     if ctx.guild and not ctx.channel.permissions_for(ctx.guild.me).embed_links:
         use_embeds = False
-    #use_embeds = await ctx.embed_requested()
+    # use_embeds = await ctx.embed_requested()
     f = formatter.HelpFormatter()
     # help by itself just lists our own commands.
     if len(cmds) == 0:
