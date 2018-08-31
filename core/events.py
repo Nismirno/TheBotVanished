@@ -9,8 +9,8 @@ import discord
 from discord.ext import commands
 
 from . import __version__
-from .utils.chat_formatting import bordered, inline, box
-from .utils import fuzzy_command_search
+from .utils.chat_formatting import bordered, inline
+# from .utils import fuzzy_command_search
 
 logger = logging.getLogger("tbv")
 
@@ -54,7 +54,7 @@ def init_events(bot):
         try:
             data = await bot.application_info()
             invite_url = discord.utils.oauth_url(data.id)
-        except:
+        except Exception:
             if bot.user.bot:
                 invite_url = "Could not fetch invite url"
             else:
@@ -122,13 +122,13 @@ def init_events(bot):
             bot._last_exception = exception_log
             if not hasattr(ctx.cog, "_{0.command.cog_name}__error".format(ctx)):
                 await ctx.send(inline(message))
-        elif isinstance(error, commands.CommandNotFound):
-            term = ctx.invoked_with + " "
-            if len(ctx.args) > 1:
-                term += " ".join(ctx.args[1:])
-            fuzzy_result = await fuzzy_command_search(ctx, ctx.invoked_with)
-            if fuzzy_result is not None:
-                await ctx.maybe_send_embed(fuzzy_result)
+        # elif isinstance(error, commands.CommandNotFound):
+            # term = ctx.invoked_with + " "
+            # if len(ctx.args) > 1:
+            #     term += " ".join(ctx.args[1:])
+            # fuzzy_result = await fuzzy_command_search(ctx, ctx.invoked_with)
+            # if fuzzy_result is not None:
+            #     await ctx.maybe_send_embed(fuzzy_result)
         elif isinstance(error, commands.CheckFailure):
             pass
         elif isinstance(error, commands.NoPrivateMessage):
@@ -145,8 +145,9 @@ def init_events(bot):
         guild = message.guild
         channel = message.channel
         author = message.author
-        is_mod = await bot.is_mod(author)
         is_owner = await bot.is_owner(author)
+        if guild:
+            is_mod = await bot.is_mod(author)
         disabled_channels = await bot.conf.guild(guild).disabled_channels()
         if channel.id in disabled_channels and not (is_mod or is_owner):
             return

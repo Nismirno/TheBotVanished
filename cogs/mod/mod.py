@@ -83,6 +83,7 @@ class Mod:
 
     @commands.group()
     @commands.guild_only()
+    @checks.mod_or_permissions()
     async def voice(self, ctx):
         """
         Helper commands for voice channels.
@@ -90,7 +91,6 @@ class Mod:
         pass
 
     @voice.command(name="setrole")
-    @checks.mod_or_permissions()
     async def _set_voice_role(self, ctx, role: discord.Role):
         """
         Sets a role to use text channel associated with voice channel.
